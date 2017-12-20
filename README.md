@@ -9,7 +9,8 @@ This is a browser-based version of the classic game "Memory"
 * If the symbols match the cards remain open. 
 * If they do not match the cards are turned back over.
 * The game ends when all of the cards have been correctly matched.
-* The player recieves 3 stars if the game is completed in 15 turns or less, two stars for under 20 turns, 1 star for anything over 20 turns
+* The player recieves 3 stars if the game is completed in 15 turns or less, two stars for under 20 turns, 1 star for 
+  anything over 20 turns
 
 ## How to play the game
 
