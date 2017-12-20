@@ -21,6 +21,8 @@ var totalSeconds = 0;
 var timer = setInterval(displayTimer, 1000)
 //variable to hold html timer location
 var secondsLabel = document.getElementById("seconds");
+
+var isFirstClick = true;
 /*
  * Display the cards on the page
  *   - shuffle the list of cards using the provided "shuffle" method below
@@ -39,26 +41,22 @@ function newGame(){
 	openCards = []
 	moves = 0;
 	stars = $('.stars').find('.fa-star')
-		stars.css('color', 'rgb(255, 211, 0)')
+	stars.css('color', 'rgb(255, 211, 0)')
 	$('.moves').text(0);
-	console.log(moves)
 	currentSymbols = card.children('i');
 	currentSymbols.removeClass('fa-apple fa-windows fa-android fa-linux fa-tumblr-square fa-thumbs-up fa-thumbs-down fa-instagram')
 	currentSymbols.each( function(index, item){
 		$(item).addClass(shuffledSymbols[index]);
 	})
-	resetTimer()
+	resetTimer();
 }
 //restarts the game when reset button is clicke
 $('.restart').click(newGame);
 //starts a new game on page load.
 $(document).ready(newGame);
-	
-
 /* 
  * Shuffle function from http://stackoverflow.com/a/2450976
  */
-
 function shuffle(array) {
     var currentIndex = array.length, temporaryValue, randomIndex;
 
@@ -72,8 +70,6 @@ function shuffle(array) {
 
     return array;
 }
-
-
 
 /*
  * set up the event listener for a card. If a card is clicked:
@@ -92,6 +88,10 @@ function shuffle(array) {
  */
 
  $('.card').click( function(event) {
+ 	if (isFirstClick) {
+		startTimer();
+		isFirstClick = false;
+	}
 	var card = $(event.target); 
 	if (!card.hasClass('match') && !card.hasClass('show')){
 		if (openCards.length < 2){
@@ -103,7 +103,6 @@ function shuffle(array) {
 	console.log(matchedCards)		
 	console.log(openCards)
 });
-
 /* checks to see if two open cards match and calls various functions to deal with matched or unmatched showing cards. 
  * clears the openCards array, calls methods to increment the move counter and set the current score.
  */
@@ -123,7 +122,6 @@ function reconcileTurn(){
 		win()
 	}
 }
-
 
 /*
  * adds the classes open and show to a card
@@ -159,26 +157,25 @@ function incrementMoves(){
 	moves += 1;
 	$('.moves').text(moves);
 }
-/* 
- * sets up the timer
- */
-/*function setTimeInterval(){
-	setInterval(displayTimer, 1000);
-}*/
 
 //displays and increments the timer
 function displayTimer() {
+  var secondsLabel = document.getElementById("seconds");
   ++totalSeconds;
-  secondsLabel.innerHTML = '&nbsp &nbsp Timer ' + totalSeconds;
+  secondsLabel.innerHTML = '&nbsp; &nbsp; Timer ' + totalSeconds;
 }
 
-//resets the timer
-function resetTimer() {
-	clearInterval(timer);
-	totalSeconds = 0;
+//start the timer
+function startTimer() {
 	timer = setInterval(displayTimer, 1000);
 }
-
+//resets the timer to 0
+function resetTimer() {
+	totalSeconds = 0;
+	document.getElementById('seconds').innerHTML = '&nbsp; &nbsp; Timer ' + totalSeconds;
+	isFirstClick = true;
+	clearInterval(timer);
+}
 /* 
  * checks number of moves to set score, if moves > 25 stops timer and displays losing modal window
  */
@@ -192,15 +189,10 @@ function countStars(){
 		$('.third_star').css('color', '#eee')
 		return
 	}
-	else if (moves >20  && moves <= 25){
+	else {
 		$('.second_star').css('color', '#eee')
 		return
 	}
-	else{
-		$('.first_star').css('color', '#eee')
-	}
-	losingMessage();
-	clearInterval(timer);
 }	
 
 //checks to see if player has won, if so stops timer calls function to display winning modal window
@@ -218,14 +210,9 @@ function winningMessage() {
 	countStars();
 	$('#winningText').text("It took you "+totalSeconds+" seconds");
 	$('#winningModal').css('display','block');
-
-}
-//displays modal window when you lose
-function losingMessage() {
-	$('#losingModal').css('display','block');
 }
 
-// clicking on the (x), closes the modal windw
+// clicking on the (x), closes the modal window
 $('.close').click(function() {
     $('.modal').css('display', 'none');
 });
@@ -236,14 +223,10 @@ window.onclick = function(event) {
 };
 
 // play again starts a new game
-$('.play').click(newGame);
- 
-
-/*
- * these two lines of code call newGame upon page load or when the reset button is clicked.
- */
-$('.restart').click(newGame);
-$(document).ready(newGame);
+$('.play').click(function (event){
+	newGame();
+	resetTimer();
+})
 
 // clicking on the (x), closes the modal windw
 $('.close').click(function() {
